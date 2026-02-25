@@ -16,7 +16,8 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 
 builder.Services
     .AddScoped<BookServices>()
-    .AddScoped<UserServices>();
+    .AddScoped<UserServices>()
+    .AddScoped<CategoryServices>();
 
 var app = builder.Build();
 
@@ -31,7 +32,8 @@ app.UseHttpsRedirection();
 RouteGroupBuilder apiGroup = app.MapGroup("api");
 
 apiGroup.MapBookEndpoints()
-        .MapUserEndpoints();
+        .MapUserEndpoints()
+        .MapCategoryEndpoints();
 
 app.MapGet("/", () => $"Running in {app.Environment.EnvironmentName} right now.");
 
