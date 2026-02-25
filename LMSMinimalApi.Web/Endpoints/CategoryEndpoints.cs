@@ -2,38 +2,38 @@
 using LMSMinimalApi.Services;
 using Microsoft.AspNetCore.Http.HttpResults;
 
-namespace LMSMinimalApi.Web.Endpoints
+namespace LMSMinimalApi.Web.Endpoints;
+
+public static class CategoryEndpoints
 {
-    public static class CategoryEndpoints
+    public static IEndpointRouteBuilder MapCategoryGroup(this IEndpointRouteBuilder endpoints)
     {
-        public static IEndpointRouteBuilder MapCategoryGroup(this IEndpointRouteBuilder endpoints)
-        {
-            return endpoints
-                .MapGroup("Category");
-        }
-        public static IEndpointRouteBuilder MapCategoryEndpoints(this IEndpointRouteBuilder endpoints)
-        {
-            ArgumentNullException.ThrowIfNull(endpoints);
+        return endpoints
+            .MapGroup("Category");
+    }
 
-            IEndpointRouteBuilder categoryGroup = endpoints.MapCategoryGroup();
+    public static IEndpointRouteBuilder MapCategoryEndpoints(this IEndpointRouteBuilder endpoints)
+    {
+        ArgumentNullException.ThrowIfNull(endpoints);
 
-            categoryGroup.MapGet("", GetCategory);
-            categoryGroup.MapGet("{ID:int}", GetCategoryByID);
+        var categoryGroup = endpoints.MapCategoryGroup();
 
-            return endpoints;
-        }
+        categoryGroup.MapGet("", GetCategory);
+        categoryGroup.MapGet("{ID:int}", GetCategoryByID);
 
-        private static Ok<IEnumerable<CategoryDTO>> GetCategory(CategoryServices categoryServices)
-        {
-            IEnumerable<CategoryDTO> categories = categoryServices.GetCategoriesList();
+        return endpoints;
+    }
 
-            return TypedResults.Ok(categories);
-        }
+    private static Ok<IEnumerable<CategoryDTO>> GetCategory(CategoryServices categoryServices)
+    {
+        var categories = categoryServices.GetCategoriesList();
 
-        private static IResult GetCategoryByID(CategoryServices categoryServices, int ID)
-        {
-            CategoryDTO? category = categoryServices.GetCategoryByID(ID);
-            return category == null ? TypedResults.NotFound() : TypedResults.Ok(category);
-        }
+        return TypedResults.Ok(categories);
+    }
+
+    private static IResult GetCategoryByID(CategoryServices categoryServices, int ID)
+    {
+        var category = categoryServices.GetCategoryByID(ID);
+        return category == null ? TypedResults.NotFound("ID Not Found.") : TypedResults.Ok(category);
     }
 }

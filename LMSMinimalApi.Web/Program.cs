@@ -22,21 +22,17 @@ builder.Services
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
-{
-    app.MapOpenApi();
-}
+if (app.Environment.IsDevelopment()) app.MapOpenApi();
 
 app.UseHttpsRedirection();
 
-RouteGroupBuilder apiGroup = app.MapGroup("api");
+var apiGroup = app.MapGroup("api");
 
 apiGroup.MapBookEndpoints()
-        .MapUserEndpoints()
-        .MapCategoryEndpoints();
+    .MapUserEndpoints()
+    .MapCategoryEndpoints();
 
 app.MapGet("/", () => $"Running in {app.Environment.EnvironmentName} right now.");
 
 
 app.Run();
-

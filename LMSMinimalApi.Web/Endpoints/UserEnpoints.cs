@@ -2,44 +2,44 @@
 using LMSMinimalApi.Services;
 using Microsoft.AspNetCore.Http.HttpResults;
 
-namespace LMSMinimalApi.Web.Endpoints
+namespace LMSMinimalApi.Web.Endpoints;
+
+public static class UserEnpoints
 {
-    public static class UserEnpoints
+    public static IEndpointRouteBuilder MapUserGroup(this IEndpointRouteBuilder endpoints)
     {
-        public static IEndpointRouteBuilder MapUserGroup(this IEndpointRouteBuilder endpoints)
-        {
-            return endpoints
-                .MapGroup("Users");
-        }
-        public static IEndpointRouteBuilder MapUserEndpoints(this IEndpointRouteBuilder endpoints)
-        {
-            ArgumentNullException.ThrowIfNull(endpoints);
+        return endpoints
+            .MapGroup("Users");
+    }
 
-            IEndpointRouteBuilder userGroup = endpoints.MapUserGroup();
+    public static IEndpointRouteBuilder MapUserEndpoints(this IEndpointRouteBuilder endpoints)
+    {
+        ArgumentNullException.ThrowIfNull(endpoints);
 
-            userGroup.MapGet("", GetUsers);
-            userGroup.MapGet("{ID:int}", GetUser);
-            userGroup.MapGet("ByType/{ID:int}", GetUsersByType);
+        var userGroup = endpoints.MapUserGroup();
 
-            return endpoints;
-        }
+        userGroup.MapGet("", GetUsers);
+        userGroup.MapGet("{ID:int}", GetUser);
+        userGroup.MapGet("ByType/{ID:int}", GetUsersByType);
 
-        private static Ok<IEnumerable<UsersDTO>> GetUsers(UserServices userServices)
-        {
-            IEnumerable<UsersDTO> users = userServices.GetUsersList();
-            return TypedResults.Ok(users);
-        }
+        return endpoints;
+    }
 
-        private static IResult GetUser(UserServices userServices, int ID)
-        {
-            UsersDTO? user = userServices.GetUserByID(ID);
-            return user == null ? TypedResults.NotFound() : TypedResults.Ok(user);
-        }
+    private static Ok<IEnumerable<UsersDTO>> GetUsers(UserServices userServices)
+    {
+        var users = userServices.GetUsersList();
+        return TypedResults.Ok(users);
+    }
 
-        private static IResult GetUsersByType(UserServices userServices, int ID)
-        {
-            IEnumerable<UsersDTO> users = userServices.GetUsersByType(ID);
-            return TypedResults.Ok(users);
-        }
+    private static IResult GetUser(UserServices userServices, int ID)
+    {
+        var user = userServices.GetUserByID(ID);
+        return user == null ? TypedResults.NotFound() : TypedResults.Ok(user);
+    }
+
+    private static IResult GetUsersByType(UserServices userServices, int ID)
+    {
+        var users = userServices.GetUsersByType(ID);
+        return TypedResults.Ok(users);
     }
 }

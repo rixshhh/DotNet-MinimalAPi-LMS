@@ -2,32 +2,31 @@
 using LMSMinimalApi.Services;
 using Microsoft.AspNetCore.Http.HttpResults;
 
-namespace LMSMinimalApi.Web.Endpoints
+namespace LMSMinimalApi.Web.Endpoints;
+
+public static class BookEndpoints
 {
-    public static class BookEndpoints
+    public static IEndpointRouteBuilder MapBookEndpoints(this IEndpointRouteBuilder endpoints)
     {
-        public static IEndpointRouteBuilder MapBookEndpoints(this IEndpointRouteBuilder endpoints)
-        {
-            ArgumentNullException.ThrowIfNull(endpoints);
+        ArgumentNullException.ThrowIfNull(endpoints);
 
-            endpoints.MapGet("Books", GetBooks);
-            endpoints.MapGet("Books/{ID:int}", GetBook);
+        endpoints.MapGet("Books", GetBooks);
+        endpoints.MapGet("Books/{ID:int}", GetBook);
 
-            return endpoints;
-        }
+        return endpoints;
+    }
 
-        private static Ok<IEnumerable<BooksDTO>> GetBooks(BookServices bookServices)
-        {
-            IEnumerable<BooksDTO> books = bookServices.GetBooksList();
+    private static Ok<IEnumerable<BooksDTO>> GetBooks(BookServices bookServices)
+    {
+        var books = bookServices.GetBooksList();
 
-            return TypedResults.Ok(books);
-        }
+        return TypedResults.Ok(books);
+    }
 
-        private static IResult GetBook(BookServices bookServices, int ID)
-        {
-            BooksDTO? book = bookServices.GetBookById(ID);
+    private static IResult GetBook(BookServices bookServices, int ID)
+    {
+        var book = bookServices.GetBookById(ID);
 
-            return book == null ? TypedResults.NotFound() : TypedResults.Ok(book);
-        }
+        return book == null ? TypedResults.NotFound() : TypedResults.Ok(book);
     }
 }
