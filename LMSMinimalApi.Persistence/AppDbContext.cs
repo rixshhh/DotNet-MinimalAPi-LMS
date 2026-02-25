@@ -10,6 +10,9 @@ namespace LMSMinimalApi.Persistence
 
         public DbSet<Books> Books { get; init; }
         public DbSet<Categories> Categories { get; init; }
+        public DbSet<Users> Users { get; init; }
+
+        public DbSet<UserTypes> UserTypes { get; init; }
 
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
