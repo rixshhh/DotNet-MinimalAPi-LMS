@@ -1,0 +1,6 @@
+@LMSMinimalApi.Web_HostAddress = http://localhost:5009
+
+GET {{LMSMinimalApi.Web_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

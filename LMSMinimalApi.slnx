@@ -1,0 +1,6 @@
+<Solution>
+  <Project Path="LMSMinimalApi.Core/LMSMinimalApi.Core.csproj" />
+  <Project Path="LMSMinimalApi.Persistence/LMSMinimalApi.Persistence.csproj" />
+  <Project Path="LMSMinimalApi.Services/LMSMinimalApi.Services.csproj" />
+  <Project Path="LMSMinimalApi.Web/LMSMinimalApi.Web.csproj" />
+</Solution>
