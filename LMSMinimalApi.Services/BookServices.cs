@@ -48,23 +48,28 @@ public sealed class BookServices
             .FirstOrDefault();
 
         return bookDto;
+    }
 
-        // Option B (alternative): fetch entity then map (uncomment if you prefer)
-        /*
-        var book = _DbContext.Books
-            .Include(b => b.Categories)
-            .FirstOrDefault(s => s.ID == ID);
+    public IEnumerable<BooksDTO> GetBookBySearch(string? BookName)
+    {
+        var query = _DbContext.Books.AsQueryable();
 
-        if (book == null) return null;
+        if (!string.IsNullOrWhiteSpace(BookName))
+        {
+            query = query.Where(b => b.BookName.Contains(BookName));
+        }
 
-        return new BooksDTO(
-            book.ID,
-            book.BookName,
-            book.Author,
-            book.Publisher,
-            book.Price,
-            book.Categories.CategoryName
-        );
-        */
+        var result = query
+             .Select(b => new BooksDTO
+             (
+                 b.ID,
+                 b.BookName,
+                 b.Author,
+                 b.Publisher,
+                 b.Price,
+                 b.Categories.CategoryName
+             )).ToList();
+
+        return result;
     }
 }

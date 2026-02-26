@@ -1,7 +1,7 @@
-﻿using System.Collections.ObjectModel;
-using LMSMinimalApi.Core.DTOs;
+﻿using LMSMinimalApi.Core.DTOs;
 using LMSMinimalApi.Persistence;
 using Microsoft.Extensions.Logging;
+using System.Collections.ObjectModel;
 
 namespace LMSMinimalApi.Services;
 
@@ -38,6 +38,8 @@ public sealed class CategoryServices
             .FirstOrDefault();
 
         if (category == null) _logger.LogWarning("Category with ID {ID} not found.", ID);
+
+
 
         return category;
     }

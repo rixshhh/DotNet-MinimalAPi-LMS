@@ -9,4 +9,7 @@ public sealed class Books
     public decimal Price { get; set; }
     public int CategoryID { get; set; } // Foreign Key
     public required Categories Categories { get; set; }
+
+    public IList<BookIssued> BookIssueds { get; init; } = [];
+
 }

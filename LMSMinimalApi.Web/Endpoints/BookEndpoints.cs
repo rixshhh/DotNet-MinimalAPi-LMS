@@ -6,12 +6,20 @@ namespace LMSMinimalApi.Web.Endpoints;
 
 public static class BookEndpoints
 {
+    public static IEndpointRouteBuilder MapBookGroup(this IEndpointRouteBuilder endpoints)
+    {
+        return endpoints
+            .MapGroup("Books");
+    }
     public static IEndpointRouteBuilder MapBookEndpoints(this IEndpointRouteBuilder endpoints)
     {
         ArgumentNullException.ThrowIfNull(endpoints);
 
-        endpoints.MapGet("Books", GetBooks);
-        endpoints.MapGet("Books/{ID:int}", GetBook);
+        var booksGroup = endpoints.MapBookGroup();
+
+        booksGroup.MapGet("", GetBooks);
+        booksGroup.MapGet("{ID:int}", GetBook);
+        booksGroup.MapGet("Search", Search);
 
         return endpoints;
     }
@@ -28,5 +36,13 @@ public static class BookEndpoints
         var book = bookServices.GetBookById(ID);
 
         return book == null ? TypedResults.NotFound() : TypedResults.Ok(book);
+    }
+
+    private static IResult Search(BookServices bookServices, string BookName)
+    {
+        IEnumerable<BooksDTO> books = bookServices.GetBookBySearch(BookName);
+
+        return books == null ? TypedResults.NotFound() : TypedResults.Ok(books);
+
     }
 }

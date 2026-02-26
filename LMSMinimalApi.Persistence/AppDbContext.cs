@@ -12,6 +12,7 @@ public sealed class AppDbContext : DbContext
     public DbSet<Categories> Categories { get; init; }
     public DbSet<Users> Users { get; init; }
 
+    public DbSet<BookIssued> BookIssued { get; init; }
     public DbSet<UserTypes> UserTypes { get; init; }
 
 
