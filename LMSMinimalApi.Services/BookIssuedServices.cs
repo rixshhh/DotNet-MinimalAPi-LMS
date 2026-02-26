@@ -44,7 +44,7 @@ namespace LMSMinimalApi.Services
 
             if (!string.IsNullOrWhiteSpace(user))
             {
-                query = query.Where(b => b.UserName.Contains(user));
+                query = query.Where(b => b.User.Name.Contains(user));
             }
 
             var result = query
