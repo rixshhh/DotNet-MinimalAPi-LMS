@@ -8,7 +8,7 @@ public sealed class Books
     public required string Publisher { get; set; }
     public decimal Price { get; set; }
     public int CategoryID { get; set; } // Foreign Key
-    public required Categories Categories { get; set; }
+    public Categories Categories { get; set; }
 
     public IList<BookIssued> BookIssueds { get; init; } = [];
 

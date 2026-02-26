@@ -1,4 +1,5 @@
 ﻿using LMSMinimalApi.Core.DTOs;
+using LMSMinimalApi.Core.Requests;
 using LMSMinimalApi.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
@@ -71,5 +72,48 @@ public sealed class BookServices
              )).ToList();
 
         return result;
+    }
+
+    public BooksDTO? PostBookRequest(PostBookRequest request)
+    {
+        try
+        {
+            var book = new Books
+            {
+                BookName = request.BookName,
+                Author = request.Author,
+                Publisher = request.Publisher,
+                Price = request.Price,
+                CategoryID = request.CategoryID
+            };
+
+            _DbContext.Books.Add(book);
+            _DbContext.SaveChanges();
+
+            var bookDto = new BooksDTO(
+                book.ID,
+                book.BookName,
+                book.Author,
+                book.Publisher,
+                book.Price,
+                _DbContext.Categories
+                    .Where(c => c.ID == book.CategoryID)
+                    .Select(c => c.CategoryName)
+                    .FirstOrDefault() ?? string.Empty
+            );
+            return bookDto;
+        }
+        catch (DbUpdateException ex)
+        {
+            _logger.LogError(ex,
+                "Error while creating a Book.");
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e, "Error while creating a Book with name {@BookName}.", request);
+        }
+
+        return null;
+
     }
 }

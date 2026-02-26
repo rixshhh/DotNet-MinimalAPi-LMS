@@ -1,4 +1,5 @@
 ﻿using LMSMinimalApi.Core.DTOs;
+using LMSMinimalApi.Core.Requests;
 using LMSMinimalApi.Services;
 using Microsoft.AspNetCore.Http.HttpResults;
 
@@ -20,6 +21,7 @@ public static class BookEndpoints
         booksGroup.MapGet("", GetBooks);
         booksGroup.MapGet("{ID:int}", GetBook);
         booksGroup.MapGet("Search", Search);
+        booksGroup.MapPost("", PostBookRequest);
 
         return endpoints;
     }
@@ -44,5 +46,16 @@ public static class BookEndpoints
 
         return books == null ? TypedResults.NotFound() : TypedResults.Ok(books);
 
+    }
+
+    private static IResult PostBookRequest(BookServices bookServices, PostBookRequest request)
+    {
+        if (string.IsNullOrWhiteSpace(request.BookName))
+            return TypedResults.BadRequest("BookName is required.");
+
+        var result = bookServices.PostBookRequest(request);
+        return result is null
+            ? TypedResults.Problem("There was some problem. See log for more details.")
+            : TypedResults.Ok(result);
     }
 }
