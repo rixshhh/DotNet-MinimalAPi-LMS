@@ -1,4 +1,5 @@
 ﻿using LMSMinimalApi.Core.DTOs;
+using LMSMinimalApi.Core.Requests;
 using LMSMinimalApi.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
@@ -24,7 +25,8 @@ public sealed class UserServices
                 u.ID,
                 u.Name,
                 u.UserType.TypeName,
-                u.UserType.MaxBooks
+                u.UserType.MaxBooks,
+                u.IsActive
             )).ToList();
 
         return users;
@@ -38,7 +40,8 @@ public sealed class UserServices
                 s.ID,
                 s.Name,
                 s.UserType.TypeName,
-                s.UserType.MaxBooks
+                s.UserType.MaxBooks,
+                s.IsActive
             )).FirstOrDefault();
 
         return user;
@@ -53,8 +56,139 @@ public sealed class UserServices
                 u.ID,
                 u.Name,
                 u.UserType.TypeName,
-                u.UserType.MaxBooks
+                u.UserType.MaxBooks,
+                u.IsActive
             )).ToList();
         return users;
+    }
+    public UsersDTO? CreateUserRequest(PostUserRequest request)
+    {
+        try
+        {
+            var user = new Users
+            {
+                Name = request.Name,
+                UserTypeID = request.UserTypeID
+            };
+
+            _DbContext.Users.Add(user);
+            _DbContext.SaveChanges();
+
+            var result = new UsersDTO(
+                user.ID,
+                user.Name,
+                _DbContext.UserTypes
+                    .Where(u => u.ID == user.UserTypeID)
+                    .Select(u => u.TypeName)
+                    .FirstOrDefault() ?? string.Empty,
+                _DbContext.UserTypes
+                    .Where(u => u.ID == user.UserTypeID)
+                    .Select(u => u.MaxBooks)
+                    .FirstOrDefault(),
+                user.IsActive
+            );
+
+            return result;
+        }
+        catch (DbUpdateException ex)
+        {
+            _logger.LogError(ex,
+                "Error while creating a User.");
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e, "Error while creating a User with name {@Name}.", request);
+        }
+
+        return null;
+    }
+
+    public UsersDTO? UpdateUser(int Id, PostUserRequest request)
+    {
+        try
+        {
+            var user = _DbContext.Users.Find(Id);
+            if (user == null)
+            {
+                _logger.LogWarning("User with ID {Id} not found for update.", Id);
+                return null;
+            }
+
+            user.Name = request.Name;
+            user.UserTypeID = request.UserTypeID;
+            user.IsActive = request.IsActive;
+
+            _DbContext.SaveChanges();
+
+            var result = new UsersDTO(
+                user.ID,
+                user.Name,
+                _DbContext.UserTypes
+                    .Where(u => u.ID == user.UserTypeID)
+                    .Select(u => u.TypeName)
+                    .FirstOrDefault() ?? string.Empty,
+                _DbContext.UserTypes
+                    .Where(u => u.ID == user.UserTypeID)
+                    .Select(u => u.MaxBooks)
+                    .FirstOrDefault(),
+                user.IsActive
+            );
+
+            return result;
+        }
+        catch (DbUpdateException ex)
+        {
+            _logger.LogError(ex,
+                "Error while updating a User with ID {Id}.", Id);
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e, "Error while updating a User with ID {Id} and name {@Name}.", Id, request);
+        }
+        return null;
+    }
+
+    public UsersDTO? PatchUser(int Id, PatchUserIsActiveRequest request)
+    {
+        try
+        {
+            var user = _DbContext.Users.Find(Id);
+
+            if (user == null)
+            {
+                _logger.LogWarning("User with ID {Id} not found for patching.", Id);
+                return null;
+            }
+
+            _DbContext.Entry(user).CurrentValues.SetValues(request);
+
+            _DbContext.SaveChanges();
+
+            var result = new UsersDTO(
+                user.ID,
+                user.Name,
+                _DbContext.UserTypes
+                    .Where(u => u.ID == user.UserTypeID)
+                    .Select(u => u.TypeName)
+                    .FirstOrDefault() ?? string.Empty,
+                _DbContext.UserTypes
+                    .Where(u => u.ID == user.UserTypeID)
+                    .Select(u => u.MaxBooks)
+                    .FirstOrDefault(),
+                user.IsActive
+            );
+
+            return result;
+        }
+        catch (DbUpdateException ex)
+        {
+            _logger.LogError(ex,
+                "Error while patching a User with ID {Id}.", Id);
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e, "Error while patching a User with ID {Id} and IsActive status.", Id);
+        }
+        return null;
     }
 }

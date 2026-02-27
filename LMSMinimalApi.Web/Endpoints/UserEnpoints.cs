@@ -1,4 +1,5 @@
 ﻿using LMSMinimalApi.Core.DTOs;
+using LMSMinimalApi.Core.Requests;
 using LMSMinimalApi.Services;
 using Microsoft.AspNetCore.Http.HttpResults;
 
@@ -22,6 +23,10 @@ public static class UserEnpoints
         userGroup.MapGet("{ID:int}", GetUser);
         userGroup.MapGet("ByType/{ID:int}", GetUsersByType);
 
+        userGroup.MapPost("", CreateUser);
+        userGroup.MapPut("{ID:int}", Update);
+        userGroup.MapPatch("{ID:int}", Patch);
+
         return endpoints;
     }
 
@@ -41,5 +46,29 @@ public static class UserEnpoints
     {
         var users = userServices.GetUsersByType(ID);
         return TypedResults.Ok(users);
+    }
+
+    private static IResult CreateUser(UserServices userServices, PostUserRequest request)
+    {
+        var result = userServices.CreateUserRequest(request);
+        return result is null
+            ? TypedResults.Problem("There was some problem. See log for more details.")
+            : TypedResults.Ok(result);
+    }
+
+    private static IResult Update(UserServices userServices, int ID, PostUserRequest request)
+    {
+        var result = userServices.UpdateUser(ID, request);
+        return result is null
+            ? TypedResults.Problem("There was some problem. See log for more details.")
+            : TypedResults.Ok(result);
+    }
+
+    private static IResult Patch(UserServices userServices, int Id, PatchUserIsActiveRequest request)
+    {
+        var result = userServices.PatchUser(Id, request);
+        return result is null
+            ? TypedResults.Problem("There was some problem. See log for more details.")
+            : TypedResults.Ok(result);
     }
 }

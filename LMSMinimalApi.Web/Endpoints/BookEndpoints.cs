@@ -22,6 +22,8 @@ public static class BookEndpoints
         booksGroup.MapGet("{ID:int}", GetBook);
         booksGroup.MapGet("Search", Search);
         booksGroup.MapPost("", PostBookRequest);
+        booksGroup.MapPut("{ID:int}", Update);
+        booksGroup.MapDelete("{ID:int}", Delete);
 
         return endpoints;
     }
@@ -54,6 +56,24 @@ public static class BookEndpoints
             return TypedResults.BadRequest("BookName is required.");
 
         var result = bookServices.PostBookRequest(request);
+        return result is null
+            ? TypedResults.Problem("There was some problem. See log for more details.")
+            : TypedResults.Ok(result);
+    }
+
+    private static IResult Update(BookServices bookServices, PostBookRequest requests, int ID)
+    {
+        var result = bookServices.UpdateBook(ID, requests);
+
+        return result is null
+            ? TypedResults.Problem("There was some problem. See log for more details.")
+            : TypedResults.Ok(result);
+    }
+
+    private static IResult Delete(BookServices bookServices, int ID)
+    {
+        var result = bookServices.DeleteBook(ID);
+
         return result is null
             ? TypedResults.Problem("There was some problem. See log for more details.")
             : TypedResults.Ok(result);
