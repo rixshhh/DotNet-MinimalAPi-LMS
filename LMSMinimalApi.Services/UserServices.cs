@@ -61,6 +61,7 @@ public sealed class UserServices
             )).ToList();
         return users;
     }
+
     public UsersDTO? CreateUserRequest(PostUserRequest request)
     {
         try
@@ -145,6 +146,7 @@ public sealed class UserServices
         {
             _logger.LogError(e, "Error while updating a User with ID {Id} and name {@Name}.", Id, request);
         }
+
         return null;
     }
 
@@ -189,6 +191,7 @@ public sealed class UserServices
         {
             _logger.LogError(e, "Error while patching a User with ID {Id} and IsActive status.", Id);
         }
+
         return null;
     }
 }

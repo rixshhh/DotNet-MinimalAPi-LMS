@@ -11,5 +11,4 @@ public sealed class Books
     public Categories Categories { get; set; }
 
     public IList<BookIssued> BookIssueds { get; init; } = [];
-
 }

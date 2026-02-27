@@ -1,25 +1,23 @@
-﻿namespace LMSMinimalApi.Core.DTOs
+﻿namespace LMSMinimalApi.Core.DTOs;
+
+public sealed class BookIssuedDTO(
+    int ID,
+    string BookName,
+    string UserName,
+    DateOnly IssueDate,
+    DateOnly RenewDate,
+    bool RenewCount,
+    DateOnly? ReturnDate,
+    decimal BookPrice
+)
 {
-    public sealed class BookIssuedDTO(
-        int ID,
-        string BookName,
-        string UserName,
-        DateOnly IssueDate,
-        DateOnly RenewDate,
-        bool RenewCount,
-        DateOnly? ReturnDate,
-        decimal BookPrice
-    )
-    {
-        public int ID { get; } = ID;
-        public string BookName { get; } = BookName;
-        public string UserName { get; } = UserName;
-        public DateOnly IssueDate { get; } = IssueDate;
-        public DateOnly RenewDate { get; } = RenewDate;
+    public int ID { get; } = ID;
+    public string BookName { get; } = BookName;
+    public string UserName { get; } = UserName;
+    public DateOnly IssueDate { get; } = IssueDate;
+    public DateOnly RenewDate { get; } = RenewDate;
 
-        public bool RenewCount { get; } = RenewCount;
-        public DateOnly? ReturnDate { get; } = ReturnDate;
-        public decimal BookPrice { get; } = BookPrice;
-
-    }
+    public bool RenewCount { get; } = RenewCount;
+    public DateOnly? ReturnDate { get; } = ReturnDate;
+    public decimal BookPrice { get; } = BookPrice;
 }

@@ -1,7 +1,6 @@
-﻿namespace LMSMinimalApi.Core.Requests
+﻿namespace LMSMinimalApi.Core.Requests;
+
+public sealed class PatchUserIsActiveRequest
 {
-    public sealed class PatchUserIsActiveRequest
-    {
-        public bool IsActive { get; init; }
-    }
+    public bool IsActive { get; init; }
 }

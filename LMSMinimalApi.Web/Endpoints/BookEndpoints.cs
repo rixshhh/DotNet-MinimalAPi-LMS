@@ -12,6 +12,7 @@ public static class BookEndpoints
         return endpoints
             .MapGroup("Books");
     }
+
     public static IEndpointRouteBuilder MapBookEndpoints(this IEndpointRouteBuilder endpoints)
     {
         ArgumentNullException.ThrowIfNull(endpoints);
@@ -44,10 +45,9 @@ public static class BookEndpoints
 
     private static IResult Search(BookServices bookServices, string BookName)
     {
-        IEnumerable<BooksDTO> books = bookServices.GetBookBySearch(BookName);
+        var books = bookServices.GetBookBySearch(BookName);
 
         return books == null ? TypedResults.NotFound() : TypedResults.Ok(books);
-
     }
 
     private static IResult PostBookRequest(BookServices bookServices, PostBookRequest request)

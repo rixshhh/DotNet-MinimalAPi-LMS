@@ -55,21 +55,18 @@ public sealed class BookServices
     {
         var query = _DbContext.Books.AsQueryable();
 
-        if (!string.IsNullOrWhiteSpace(BookName))
-        {
-            query = query.Where(b => b.BookName.Contains(BookName));
-        }
+        if (!string.IsNullOrWhiteSpace(BookName)) query = query.Where(b => b.BookName.Contains(BookName));
 
         var result = query
-             .Select(b => new BooksDTO
-             (
-                 b.ID,
-                 b.BookName,
-                 b.Author,
-                 b.Publisher,
-                 b.Price,
-                 b.Categories.CategoryName
-             )).ToList();
+            .Select(b => new BooksDTO
+            (
+                b.ID,
+                b.BookName,
+                b.Author,
+                b.Publisher,
+                b.Price,
+                b.Categories.CategoryName
+            )).ToList();
 
         return result;
     }
@@ -114,7 +111,6 @@ public sealed class BookServices
         }
 
         return null;
-
     }
 
     public BooksDTO? UpdateBook(int Id, PostBookRequest requests)
@@ -164,26 +160,23 @@ public sealed class BookServices
         {
             var book = _DbContext.Books.FirstOrDefault(b => b.ID == ID);
 
-            if (book is null)
-            {
-                throw new ConflictException($"Cannot find this Id {ID}");
-            }
+            if (book is null) throw new ConflictException($"Cannot find this Id {ID}");
 
             _DbContext.Books.Remove(book);
 
             _DbContext.SaveChanges();
 
             return new BooksDTO(
-               book.ID,
-               book.BookName,
-               book.Author,
-               book.Publisher,
-               book.Price,
-               _DbContext.Categories
+                book.ID,
+                book.BookName,
+                book.Author,
+                book.Publisher,
+                book.Price,
+                _DbContext.Categories
                     .Where(c => c.ID == book.CategoryID)
                     .Select(c => c.CategoryName)
                     .FirstOrDefault() ?? string.Empty
-           );
+            );
         }
         catch (ConflictException ex)
         {
@@ -202,5 +195,4 @@ public sealed class BookServices
 
         return null;
     }
-
 }
