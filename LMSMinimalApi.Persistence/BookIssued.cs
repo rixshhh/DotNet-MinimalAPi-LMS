@@ -12,7 +12,7 @@ public sealed class BookIssued
 
     public bool RenewCount { get; set; }
     public DateOnly? ReturnDate { get; set; }
-    public string UserName { get; set; }
+
     public decimal BookPrice { get; set; }
 
     public Books Book { get; set; }

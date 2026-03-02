@@ -20,7 +20,7 @@ public class BookIssuedEntityConfigurations : IEntityTypeConfiguration<BookIssue
         builder.Property(bi => bi.RenewDate)
             .IsRequired();
 
-        builder.Property(bi => bi.UserName);
+
 
         builder.Property(bi => bi.ReturnDate)
             .IsRequired(false);
