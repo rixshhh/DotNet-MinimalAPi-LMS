@@ -21,7 +21,6 @@ public class BookIssuedEntityConfigurations : IEntityTypeConfiguration<BookIssue
             .IsRequired();
 
 
-
         builder.Property(bi => bi.ReturnDate)
             .IsRequired(false);
 

@@ -66,6 +66,24 @@ public sealed class UserServices
     {
         try
         {
+            var existingUser = _DbContext.Users
+                  .Any(u => u.Name == request.Name);
+
+            if (existingUser)
+            {
+                _logger.LogWarning("User with name {Name} already exists.", request.Name);
+                return null;
+            }
+
+            var existingUserType = _DbContext.UserTypes
+                .Any(ut => ut.ID == request.UserTypeID);
+
+            if (!existingUserType)
+            {
+                _logger.LogWarning("UserType with ID {UserTypeID} does not exist.", request.UserTypeID);
+                return null;
+            }
+
             var user = new Users
             {
                 Name = request.Name,
@@ -94,11 +112,11 @@ public sealed class UserServices
         catch (DbUpdateException ex)
         {
             _logger.LogError(ex,
-                "Error while creating a User.");
+                "Database Error while creating a User.");
         }
         catch (Exception e)
         {
-            _logger.LogError(e, "Error while creating a User with name {@Name}.", request);
+            _logger.LogError(e, "Error while creating a User with name {Name}.", request);
         }
 
         return null;

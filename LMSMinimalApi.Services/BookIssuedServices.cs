@@ -96,7 +96,6 @@ public sealed class BookIssuedServices
         {
             var bookIssue = new BookIssued
             {
-                ID = request.ID,
                 BookID = request.BookID,
                 UserID = request.UserID,
                 IssueDate = request.IssueDate,
@@ -105,6 +104,15 @@ public sealed class BookIssuedServices
                 ReturnDate = request.ReturnDate,
                 BookPrice = request.BookPrice
             };
+
+            if (bookIssue == null)
+                throw new Exception("Failed to create a Book issue from the provided request.");
+
+            if (!_DbContext.Books.Any(b => b.ID == bookIssue.BookID))
+                throw new ConflictException($"Book with ID {bookIssue.BookID} does not exist.");
+
+            if (!_DbContext.Users.Any(u => u.ID == bookIssue.UserID))
+                throw new ConflictException($"User with ID {bookIssue.UserID} does not exist.");
 
             _DbContext.BookIssued.Add(bookIssue);
             _DbContext.SaveChanges();
@@ -135,7 +143,7 @@ public sealed class BookIssuedServices
         }
         catch (Exception e)
         {
-            _logger.LogError(e, "Error while creating a BookIssue with name {@BookID}.", request);
+            _logger.LogError(e, "Error while creating a BookIssue.");
         }
 
         return null;
@@ -186,6 +194,7 @@ public sealed class BookIssuedServices
         {
             _logger.LogError(e, "Error while updating a Book issue with ID {ID} and data {@Request}.", id, request);
         }
+
         return null;
     }
 }

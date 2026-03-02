@@ -58,6 +58,7 @@ public static class BookIssuedEndpoints
             ? TypedResults.BadRequest("Unable to Create Book Issue Request")
             : TypedResults.Ok(bookIssued);
     }
+
     private static IResult UpdateIssueBook(BookIssuedServices bookIssuedServices, int id, PostBookIssuedRequest request)
     {
         var bookIssued = bookIssuedServices.UpdateBookIssueRequest(id, request);
