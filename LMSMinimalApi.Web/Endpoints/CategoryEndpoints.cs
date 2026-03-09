@@ -9,7 +9,7 @@ public static class CategoryEndpoints
     public static IEndpointRouteBuilder MapCategoryGroup(this IEndpointRouteBuilder endpoints)
     {
         return endpoints
-            .MapGroup("Category");
+            .MapGroup("Categories");
     }
 
     public static IEndpointRouteBuilder MapCategoryEndpoints(this IEndpointRouteBuilder endpoints)

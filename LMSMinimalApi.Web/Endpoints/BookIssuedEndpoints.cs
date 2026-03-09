@@ -23,7 +23,7 @@ public static class BookIssuedEndpoints
         bookIssuedGroup.MapGet("Search", GetBookIssuedByUserName);
         bookIssuedGroup.MapGet("user/{UserID:int}/bookIssued", GetBookIssuedByUserID);
         bookIssuedGroup.MapPost("", CreateIssueBook);
-        bookIssuedGroup.MapPut("{ID:int}", UpdateIssueBook);
+        bookIssuedGroup.MapPut("Renew/{ID:int}", UpdateIssueBook);
 
 
         return endpoints;
