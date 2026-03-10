@@ -24,6 +24,7 @@ public static class BookIssuedEndpoints
         bookIssuedGroup.MapGet("user/{UserID:int}/bookIssued", GetBookIssuedByUserID);
         bookIssuedGroup.MapPost("", CreateIssueBook);
         bookIssuedGroup.MapPut("Renew/{ID:int}", UpdateIssueBook);
+        bookIssuedGroup.MapDelete("Delete/{ID:int}", DeleteIssueBook);
 
 
         return endpoints;
@@ -67,4 +68,13 @@ public static class BookIssuedEndpoints
             ? TypedResults.BadRequest("Unable to Update Book Issue Request")
             : TypedResults.Ok(bookIssued);
     }
+
+    private static IResult DeleteIssueBook(BookIssuedServices bookIssuedServices, int id)
+    {
+        var isDeleted = bookIssuedServices.DeleteBookIssue(id);
+        return isDeleted
+            ? TypedResults.Ok("Book Issue Request Deleted Successfully")
+            : TypedResults.BadRequest("Unable to Delete Book Issue Request");
+    }
+
 }
