@@ -5,19 +5,17 @@ public sealed class BookIssuedDTO(
     string BookName,
     string UserName,
     DateOnly IssueDate,
-    DateOnly RenewDate,
+    DateOnly? RenewDate,
     bool RenewCount,
-    DateOnly? ReturnDate,
-    decimal BookPrice
+    DateOnly? ReturnDate
 )
 {
     public int ID { get; } = ID;
     public string BookName { get; } = BookName;
     public string UserName { get; } = UserName;
     public DateOnly IssueDate { get; } = IssueDate;
-    public DateOnly RenewDate { get; } = RenewDate;
+    public DateOnly? RenewDate { get; } = RenewDate;
 
     public bool RenewCount { get; } = RenewCount;
     public DateOnly? ReturnDate { get; } = ReturnDate;
-    public decimal BookPrice { get; } = BookPrice;
 }

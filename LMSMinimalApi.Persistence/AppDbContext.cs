@@ -18,7 +18,7 @@ public sealed class AppDbContext : DbContext
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        var t = typeof(AppDbContext);
+        Type t = typeof(AppDbContext);
         modelBuilder.ApplyConfigurationsFromAssembly(t.Assembly);
 
         base.OnModelCreating(modelBuilder);

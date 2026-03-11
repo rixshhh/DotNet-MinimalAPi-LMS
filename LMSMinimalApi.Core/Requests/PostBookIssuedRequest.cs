@@ -6,9 +6,9 @@ public sealed class PostBookIssuedRequest
     public required int BookID { get; init; }
     public required int UserID { get; init; }
     public DateOnly IssueDate { get; init; }
-    public DateOnly RenewDate { get; init; }
+    public DateOnly? RenewDate { get; init; }
 
     public bool RenewCount { get; init; }
     public DateOnly? ReturnDate { get; init; }
-    public required decimal BookPrice { get; init; }
+    public decimal BookPrice { get; init; }
 }

@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Http.HttpResults;
 
 namespace LMSMinimalApi.Web.Endpoints;
 
-public static class UserEnpoints
+public static class UserEndpoints
 {
     public static IEndpointRouteBuilder MapUserGroup(this IEndpointRouteBuilder endpoints)
     {
@@ -17,7 +17,7 @@ public static class UserEnpoints
     {
         ArgumentNullException.ThrowIfNull(endpoints);
 
-        var userGroup = endpoints.MapUserGroup();
+        IEndpointRouteBuilder userGroup = endpoints.MapUserGroup();
 
         userGroup.MapGet("", GetUsers);
         userGroup.MapGet("{ID:int}", GetUser);
@@ -32,25 +32,25 @@ public static class UserEnpoints
 
     private static Ok<IEnumerable<UsersDTO>> GetUsers(UserServices userServices)
     {
-        var users = userServices.GetUsersList();
+        IEnumerable<UsersDTO> users = userServices.GetUsersList();
         return TypedResults.Ok(users);
     }
 
     private static IResult GetUser(UserServices userServices, int ID)
     {
-        var user = userServices.GetUserByID(ID);
+        UsersDTO? user = userServices.GetUserByID(ID);
         return user == null ? TypedResults.NotFound() : TypedResults.Ok(user);
     }
 
     private static IResult GetUsersByType(UserServices userServices, int ID)
     {
-        var users = userServices.GetUsersByType(ID);
+        IEnumerable<UsersDTO> users = userServices.GetUsersByType(ID);
         return TypedResults.Ok(users);
     }
 
     private static IResult CreateUser(UserServices userServices, PostUserRequest request)
     {
-        var result = userServices.CreateUserRequest(request);
+        UsersDTO? result = userServices.CreateUserRequest(request);
         return result is null
             ? TypedResults.Problem("There was some problem. See log for more details.")
             : TypedResults.Ok(result);
@@ -58,7 +58,7 @@ public static class UserEnpoints
 
     private static IResult Update(UserServices userServices, int ID, PostUserRequest request)
     {
-        var result = userServices.UpdateUser(ID, request);
+        UsersDTO? result = userServices.UpdateUser(ID, request);
         return result is null
             ? TypedResults.Problem("There was some problem. See log for more details.")
             : TypedResults.Ok(result);
@@ -66,7 +66,7 @@ public static class UserEnpoints
 
     private static IResult Patch(UserServices userServices, int Id, PatchUserIsActiveRequest request)
     {
-        var result = userServices.PatchUser(Id, request);
+        UsersDTO? result = userServices.PatchUser(Id, request);
         return result is null
             ? TypedResults.Problem("There was some problem. See log for more details.")
             : TypedResults.Ok(result);

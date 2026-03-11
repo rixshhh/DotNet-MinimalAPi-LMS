@@ -1,9 +1,9 @@
-﻿using LMSMinimalApi.Core.DTOs;
+﻿using System.Collections.ObjectModel;
+using LMSMinimalApi.Core.DTOs;
 using LMSMinimalApi.Core.Requests;
 using LMSMinimalApi.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
-using System.Collections.ObjectModel;
 
 namespace LMSMinimalApi.Services;
 
@@ -31,21 +31,23 @@ public sealed class BookIssuedServices
                 bi.IssueDate,
                 bi.RenewDate,
                 bi.RenewCount,
-                bi.ReturnDate,
-                bi.BookPrice
+                bi.ReturnDate
             ))
             .ToList();
 
         return issuedBooks;
     }
 
-    public IEnumerable<BookIssuedDTO> GetBookIssuedBySeach(string? user)
+    public IEnumerable<BookIssuedDTO> GetBookIssuedBySearch(string? user)
     {
-        var query = _DbContext.BookIssued.AsQueryable();
+        IQueryable<BookIssued> query = _DbContext.BookIssued.AsQueryable();
 
-        if (!string.IsNullOrWhiteSpace(user)) query = query.Where(b => b.User.Name.Contains(user));
+        if (!string.IsNullOrWhiteSpace(user))
+        {
+            query = query.Where(b => b.User.Name.Contains(user));
+        }
 
-        var result = query
+        List<BookIssuedDTO> result = query
             .Include(u => u.User)
             .Include(b => b.Book)
             .Select(bi => new BookIssuedDTO(
@@ -55,8 +57,7 @@ public sealed class BookIssuedServices
                 bi.IssueDate,
                 bi.RenewDate,
                 bi.RenewCount,
-                bi.ReturnDate,
-                bi.BookPrice
+                bi.ReturnDate
             )).ToList();
 
         return new ReadOnlyCollection<BookIssuedDTO>(result);
@@ -64,96 +65,89 @@ public sealed class BookIssuedServices
 
     public IEnumerable<BookIssuedDTO> GetBookIssuedByUserId(int userId)
     {
-        var issuedBooks = _DbContext.BookIssued
+        List<BookIssuedDTO> issuedBooks = _DbContext.BookIssued
+            .Include(b => b.Book)
+            .Include(b => b.User)
             .Where(b => b.UserID == userId)
+            .Select(b => new BookIssuedDTO(
+                b.ID,
+                b.Book.BookName,
+                b.User.Name,
+                b.IssueDate,
+                b.RenewDate,
+                b.RenewCount,
+                b.ReturnDate
+            ))
             .ToList();
 
         if (!issuedBooks.Any())
-            throw new Exception($"No books found for UserID {userId}");
+        {
+            throw new ConflictException($"No books found for UserID {userId}");
+        }
 
-        var result = issuedBooks.Select(issuedBook => new BookIssuedDTO(
-            issuedBook.ID,
-            _DbContext.Books
-                .Where(b => b.ID == issuedBook.BookID)
-                .Select(b => b.BookName)
-                .FirstOrDefault() ?? string.Empty,
-            _DbContext.Users
-                .Where(u => u.ID == issuedBook.UserID)
-                .Select(u => u.Name)
-                .FirstOrDefault() ?? string.Empty,
-            issuedBook.IssueDate,
-            issuedBook.RenewDate,
-            issuedBook.RenewCount,
-            issuedBook.ReturnDate,
-            issuedBook.BookPrice
-        ));
-
-        return result;
+        return issuedBooks;
     }
 
     public BookIssuedDTO? CreateBookIssueRequest(PostBookIssuedRequest request)
     {
         try
         {
-            var user = _DbContext.Users
-            .Include(u => u.UserType)
-            .FirstOrDefault(u => u.ID == request.UserID);
+            Users? user = _DbContext.Users
+                .Include(u => u.UserType)
+                .FirstOrDefault(u => u.ID == request.UserID);
 
             if (user == null)
+            {
                 throw new ConflictException($"User with ID {request.UserID} not found.");
+            }
 
-            var book = _DbContext.Books
+            Books? book = _DbContext.Books
                 .FirstOrDefault(b => b.ID == request.BookID);
 
             if (book == null)
+            {
                 throw new ConflictException($"Book with ID {request.BookID} does not exist.");
+            }
 
             bool alreadyIssued = _DbContext.BookIssued
                 .Any(b => b.BookID == request.BookID &&
                           b.UserID == request.UserID);
 
             if (alreadyIssued)
+            {
                 throw new ConflictException("This user already has this book issued.");
+            }
 
             int issuedBooksCount = _DbContext.BookIssued
                 .Count(b => b.UserID == request.UserID && b.ReturnDate != null);
 
             if (issuedBooksCount >= user.UserType.MaxBooks)
+            {
                 throw new ConflictException(
                     $"User already issued maximum books allowed ({user.UserType.MaxBooks}).");
+            }
 
-            var bookIssue = new BookIssued
+            BookIssued bookIssue = new()
             {
                 BookID = request.BookID,
                 UserID = request.UserID,
-                IssueDate = request.IssueDate,
-                RenewDate = request.RenewDate,
-                RenewCount = request.RenewCount,
-                ReturnDate = request.ReturnDate,
-                BookPrice = request.BookPrice
+                IssueDate = DateOnly.FromDateTime(DateTime.Today),
+                RenewDate = null,
+                RenewCount = false,
+                ReturnDate = DateOnly.FromDateTime(DateTime.Today).AddDays(15)
             };
-
-            if (bookIssue == null)
-                throw new Exception("Failed to create a Book issue from the provided request.");
 
             _DbContext.BookIssued.Add(bookIssue);
             _DbContext.SaveChanges();
 
-            var CreatedIssuedBook = new BookIssuedDTO(
+            BookIssuedDTO CreatedIssuedBook = new(
                 bookIssue.ID,
-                _DbContext.Books
-                    .Where(b => b.ID == bookIssue.BookID)
-                    .Select(b => b.BookName)
-                    .FirstOrDefault() ?? string.Empty,
-                _DbContext.Users
-                    .Where(u => u.ID == bookIssue.UserID)
-                    .Select(u => u.Name)
-                    .FirstOrDefault() ?? string.Empty,
+                book.BookName,
+                user.Name,
                 bookIssue.IssueDate,
                 bookIssue.RenewDate,
                 bookIssue.RenewCount,
-                bookIssue.ReturnDate,
-                bookIssue.BookPrice
+                bookIssue.ReturnDate
             );
 
             return CreatedIssuedBook;
@@ -177,9 +171,12 @@ public sealed class BookIssuedServices
     {
         try
         {
-            var BookIssue = _DbContext.BookIssued.Find(id);
+            BookIssued? BookIssue = _DbContext.BookIssued.Find(id);
 
-            if (BookIssue == null) return null;
+            if (BookIssue == null)
+            {
+                return null;
+            }
 
             BookIssue.BookID = request.BookID;
             BookIssue.UserID = request.UserID;
@@ -187,11 +184,10 @@ public sealed class BookIssuedServices
             BookIssue.RenewDate = request.RenewDate;
             BookIssue.RenewCount = request.RenewCount;
             BookIssue.ReturnDate = request.ReturnDate;
-            BookIssue.BookPrice = request.BookPrice;
 
             _DbContext.SaveChanges();
 
-            var updatedBookIssueDTO = new BookIssuedDTO(
+            BookIssuedDTO updatedBookIssueDTO = new(
                 BookIssue.ID,
                 _DbContext.Books
                     .Where(b => b.ID == BookIssue.BookID)
@@ -204,8 +200,7 @@ public sealed class BookIssuedServices
                 BookIssue.IssueDate,
                 BookIssue.RenewDate,
                 BookIssue.RenewCount,
-                BookIssue.ReturnDate,
-                BookIssue.BookPrice
+                BookIssue.ReturnDate
             );
             return updatedBookIssueDTO;
         }
@@ -221,15 +216,18 @@ public sealed class BookIssuedServices
 
         return null;
     }
+
     public bool DeleteBookIssue(int ID)
     {
         try
         {
-            var bookIssue = _DbContext.BookIssued
+            BookIssued? bookIssue = _DbContext.BookIssued
                 .FirstOrDefault(b => b.ID == ID);
 
             if (bookIssue == null)
+            {
                 throw new ConflictException($"Book Issue with ID {ID} not found.");
+            }
 
             _DbContext.BookIssued.Remove(bookIssue);
             _DbContext.SaveChanges();

@@ -36,7 +36,7 @@ public sealed class BookServices
 
     public BooksDTO? GetBookById(int ID)
     {
-        var bookDto = _DbContext.Books
+        BooksDTO? bookDto = _DbContext.Books
             .Where(s => s.ID == ID)
             .Select(b => new BooksDTO(
                 b.ID,
@@ -53,11 +53,14 @@ public sealed class BookServices
 
     public IEnumerable<BooksDTO> GetBookBySearch(string? BookName)
     {
-        var query = _DbContext.Books.AsQueryable();
+        IQueryable<Books> query = _DbContext.Books.AsQueryable();
 
-        if (!string.IsNullOrWhiteSpace(BookName)) query = query.Where(b => b.BookName.Contains(BookName));
+        if (!string.IsNullOrWhiteSpace(BookName))
+        {
+            query = query.Where(b => b.BookName.Contains(BookName));
+        }
 
-        var result = query
+        List<BooksDTO> result = query
             .Select(b => new BooksDTO
             (
                 b.ID,
@@ -75,7 +78,7 @@ public sealed class BookServices
     {
         try
         {
-            var book = new Books
+            Books book = new()
             {
                 BookName = request.BookName,
                 Author = request.Author,
@@ -87,7 +90,7 @@ public sealed class BookServices
             _DbContext.Books.Add(book);
             _DbContext.SaveChanges();
 
-            var bookDto = new BooksDTO(
+            BooksDTO bookDto = new(
                 book.ID,
                 book.BookName,
                 book.Author,
@@ -117,9 +120,12 @@ public sealed class BookServices
     {
         try
         {
-            var book = _DbContext.Books.Find(Id);
+            Books? book = _DbContext.Books.Find(Id);
 
-            if (book is null) return null;
+            if (book is null)
+            {
+                return null;
+            }
 
             book.BookName = requests.BookName;
             book.Author = requests.Author;
@@ -158,9 +164,12 @@ public sealed class BookServices
     {
         try
         {
-            var book = _DbContext.Books.FirstOrDefault(b => b.ID == ID);
+            Books? book = _DbContext.Books.FirstOrDefault(b => b.ID == ID);
 
-            if (book is null) throw new ConflictException($"Cannot find this Id {ID}");
+            if (book is null)
+            {
+                throw new ConflictException($"Cannot find this Id {ID}");
+            }
 
             _DbContext.Books.Remove(book);
 

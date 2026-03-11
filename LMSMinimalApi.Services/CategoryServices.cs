@@ -29,7 +29,7 @@ public sealed class CategoryServices
 
     public CategoryDTO? GetCategoryByID(int ID)
     {
-        var category = _DbContext.Categories
+        CategoryDTO? category = _DbContext.Categories
             .Where(c => c.ID == ID)
             .Select(c => new CategoryDTO(
                 c.ID,
@@ -37,7 +37,10 @@ public sealed class CategoryServices
             ))
             .FirstOrDefault();
 
-        if (category == null) _logger.LogWarning("Category with ID {ID} not found.", ID);
+        if (category == null)
+        {
+            _logger.LogWarning("Category with ID {ID} not found.", ID);
+        }
 
 
         return category;

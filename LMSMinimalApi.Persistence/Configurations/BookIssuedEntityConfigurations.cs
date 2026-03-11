@@ -9,23 +9,14 @@ public class BookIssuedEntityConfigurations : IEntityTypeConfiguration<BookIssue
     {
         builder.HasKey(bi => bi.ID);
 
-
-        builder.Property(bi => bi.BookPrice)
-            .HasColumnType("decimal(6,2)")
-            .IsRequired();
-
         builder.Property(bi => bi.IssueDate)
             .HasDefaultValueSql("GETDATE()");
-
-        builder.Property(bi => bi.RenewDate)
-            .IsRequired();
-
 
         builder.Property(bi => bi.ReturnDate)
             .IsRequired(false);
 
         builder.HasOne(bi => bi.Book)
-            .WithMany(b => b.BookIssueds)
+            .WithMany(b => b.BookIssued)
             .HasForeignKey(bi => bi.BookID)
             .OnDelete(DeleteBehavior.Restrict);
 

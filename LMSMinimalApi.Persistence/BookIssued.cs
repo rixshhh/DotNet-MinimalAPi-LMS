@@ -8,7 +8,7 @@ public sealed class BookIssued
     public int UserID { get; set; }
 
     public DateOnly IssueDate { get; set; }
-    public DateOnly RenewDate { get; set; }
+    public DateOnly? RenewDate { get; set; }
 
     public bool RenewCount { get; set; }
     public DateOnly? ReturnDate { get; set; }

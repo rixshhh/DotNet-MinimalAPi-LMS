@@ -10,5 +10,5 @@ public sealed class Books
     public int CategoryID { get; set; } // Foreign Key
     public Categories Categories { get; set; }
 
-    public IList<BookIssued> BookIssueds { get; init; } = [];
+    public IList<BookIssued> BookIssued { get; init; } = [];
 }

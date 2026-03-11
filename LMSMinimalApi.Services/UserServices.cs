@@ -34,7 +34,7 @@ public sealed class UserServices
 
     public UsersDTO? GetUserByID(int ID)
     {
-        var user = _DbContext.Users
+        UsersDTO? user = _DbContext.Users
             .Where(u => u.ID == ID)
             .Select(s => new UsersDTO(
                 s.ID,
@@ -66,8 +66,8 @@ public sealed class UserServices
     {
         try
         {
-            var existingUser = _DbContext.Users
-                  .Any(u => u.Name == request.Name);
+            bool existingUser = _DbContext.Users
+                .Any(u => u.Name == request.Name);
 
             if (existingUser)
             {
@@ -75,7 +75,7 @@ public sealed class UserServices
                 return null;
             }
 
-            var existingUserType = _DbContext.UserTypes
+            bool existingUserType = _DbContext.UserTypes
                 .Any(ut => ut.ID == request.UserTypeID);
 
             if (!existingUserType)
@@ -84,16 +84,12 @@ public sealed class UserServices
                 return null;
             }
 
-            var user = new Users
-            {
-                Name = request.Name,
-                UserTypeID = request.UserTypeID
-            };
+            Users user = new() { Name = request.Name, UserTypeID = request.UserTypeID };
 
             _DbContext.Users.Add(user);
             _DbContext.SaveChanges();
 
-            var result = new UsersDTO(
+            UsersDTO result = new(
                 user.ID,
                 user.Name,
                 _DbContext.UserTypes
@@ -126,7 +122,7 @@ public sealed class UserServices
     {
         try
         {
-            var user = _DbContext.Users.Find(Id);
+            Users? user = _DbContext.Users.Find(Id);
             if (user == null)
             {
                 _logger.LogWarning("User with ID {Id} not found for update.", Id);
@@ -139,7 +135,7 @@ public sealed class UserServices
 
             _DbContext.SaveChanges();
 
-            var result = new UsersDTO(
+            UsersDTO result = new(
                 user.ID,
                 user.Name,
                 _DbContext.UserTypes
@@ -172,7 +168,7 @@ public sealed class UserServices
     {
         try
         {
-            var user = _DbContext.Users.Find(Id);
+            Users? user = _DbContext.Users.Find(Id);
 
             if (user == null)
             {
@@ -184,7 +180,7 @@ public sealed class UserServices
 
             _DbContext.SaveChanges();
 
-            var result = new UsersDTO(
+            UsersDTO result = new(
                 user.ID,
                 user.Name,
                 _DbContext.UserTypes

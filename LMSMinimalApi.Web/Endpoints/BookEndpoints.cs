@@ -17,7 +17,7 @@ public static class BookEndpoints
     {
         ArgumentNullException.ThrowIfNull(endpoints);
 
-        var booksGroup = endpoints.MapBookGroup();
+        IEndpointRouteBuilder booksGroup = endpoints.MapBookGroup();
 
         booksGroup.MapGet("", GetBooks);
         booksGroup.MapGet("{ID:int}", GetBook);
@@ -31,21 +31,21 @@ public static class BookEndpoints
 
     private static Ok<IEnumerable<BooksDTO>> GetBooks(BookServices bookServices)
     {
-        var books = bookServices.GetBooksList();
+        IEnumerable<BooksDTO> books = bookServices.GetBooksList();
 
         return TypedResults.Ok(books);
     }
 
     private static IResult GetBook(BookServices bookServices, int ID)
     {
-        var book = bookServices.GetBookById(ID);
+        BooksDTO? book = bookServices.GetBookById(ID);
 
         return book == null ? TypedResults.NotFound() : TypedResults.Ok(book);
     }
 
     private static IResult Search(BookServices bookServices, string BookName)
     {
-        var books = bookServices.GetBookBySearch(BookName);
+        IEnumerable<BooksDTO>? books = bookServices.GetBookBySearch(BookName);
 
         return books == null ? TypedResults.NotFound() : TypedResults.Ok(books);
     }
@@ -53,9 +53,11 @@ public static class BookEndpoints
     private static IResult PostBookRequest(BookServices bookServices, PostBookRequest request)
     {
         if (string.IsNullOrWhiteSpace(request.BookName))
+        {
             return TypedResults.BadRequest("BookName is required.");
+        }
 
-        var result = bookServices.PostBookRequest(request);
+        BooksDTO? result = bookServices.PostBookRequest(request);
         return result is null
             ? TypedResults.Problem("There was some problem. See log for more details.")
             : TypedResults.Ok(result);
@@ -63,7 +65,7 @@ public static class BookEndpoints
 
     private static IResult Update(BookServices bookServices, PostBookRequest requests, int ID)
     {
-        var result = bookServices.UpdateBook(ID, requests);
+        BooksDTO? result = bookServices.UpdateBook(ID, requests);
 
         return result is null
             ? TypedResults.Problem("There was some problem. See log for more details.")
@@ -72,7 +74,7 @@ public static class BookEndpoints
 
     private static IResult Delete(BookServices bookServices, int ID)
     {
-        var result = bookServices.DeleteBook(ID);
+        BooksDTO? result = bookServices.DeleteBook(ID);
 
         return result is null
             ? TypedResults.Problem("There was some problem. See log for more details.")

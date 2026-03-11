@@ -16,7 +16,7 @@ public static class CategoryEndpoints
     {
         ArgumentNullException.ThrowIfNull(endpoints);
 
-        var categoryGroup = endpoints.MapCategoryGroup();
+        IEndpointRouteBuilder categoryGroup = endpoints.MapCategoryGroup();
 
         categoryGroup.MapGet("", GetCategory);
         categoryGroup.MapGet("{ID:int}", GetCategoryByID);
@@ -26,14 +26,14 @@ public static class CategoryEndpoints
 
     private static Ok<IEnumerable<CategoryDTO>> GetCategory(CategoryServices categoryServices)
     {
-        var categories = categoryServices.GetCategoriesList();
+        IEnumerable<CategoryDTO> categories = categoryServices.GetCategoriesList();
 
         return TypedResults.Ok(categories);
     }
 
     private static IResult GetCategoryByID(CategoryServices categoryServices, int ID)
     {
-        var category = categoryServices.GetCategoryByID(ID);
+        CategoryDTO? category = categoryServices.GetCategoryByID(ID);
         return category == null ? TypedResults.NotFound("ID Not Found.") : TypedResults.Ok(category);
     }
 }

@@ -17,7 +17,7 @@ public static class BookIssuedEndpoints
     {
         ArgumentNullException.ThrowIfNull(endpoints);
 
-        var bookIssuedGroup = endpoints.MapBookIssuedGroup();
+        IEndpointRouteBuilder bookIssuedGroup = endpoints.MapBookIssuedGroup();
 
         bookIssuedGroup.MapGet("", GetBookIssued);
         bookIssuedGroup.MapGet("Search", GetBookIssuedByUserName);
@@ -32,37 +32,44 @@ public static class BookIssuedEndpoints
 
     private static Ok<IEnumerable<BookIssuedDTO>> GetBookIssued(BookIssuedServices bookIssuedServices)
     {
-        var books = bookIssuedServices.GetBookIssued();
+        IEnumerable<BookIssuedDTO> books = bookIssuedServices.GetBookIssued();
 
         return TypedResults.Ok(books);
     }
 
     private static IResult GetBookIssuedByUserName(BookIssuedServices bookIssuedServices, string user)
     {
-        var bookIssued = bookIssuedServices.GetBookIssuedBySeach(user);
+        IEnumerable<BookIssuedDTO>? bookIssued = bookIssuedServices.GetBookIssuedBySearch(user);
 
         return bookIssued is null ? TypedResults.NotFound("UserName Not Found") : TypedResults.Ok(bookIssued);
     }
 
     private static IResult GetBookIssuedByUserID(BookIssuedServices bookIssuedServices, int UserID)
     {
-        var bookIssued = bookIssuedServices.GetBookIssuedByUserId(UserID);
+        IEnumerable<BookIssuedDTO>? bookIssued = bookIssuedServices.GetBookIssuedByUserId(UserID);
 
         return bookIssued is null ? TypedResults.NotFound("UserID Not Found") : TypedResults.Ok(bookIssued);
     }
 
     private static IResult CreateIssueBook(BookIssuedServices bookIssuedServices, PostBookIssuedRequest request)
     {
-        var bookIssued = bookIssuedServices.CreateBookIssueRequest(request);
+        try
+        {
+            BookIssuedDTO? bookIssued = bookIssuedServices.CreateBookIssueRequest(request);
 
-        return bookIssued is null
-            ? TypedResults.BadRequest("Unable to Create Book Issue Request")
-            : TypedResults.Ok(bookIssued);
+            return bookIssued is null
+                ? TypedResults.BadRequest("Unable to create book issue request. See Logs")
+                : TypedResults.Ok(bookIssued);
+        }
+        catch (Exception ex)
+        {
+            return TypedResults.Problem(ex.Message);
+        }
     }
 
     private static IResult UpdateIssueBook(BookIssuedServices bookIssuedServices, int id, PostBookIssuedRequest request)
     {
-        var bookIssued = bookIssuedServices.UpdateBookIssueRequest(id, request);
+        BookIssuedDTO? bookIssued = bookIssuedServices.UpdateBookIssueRequest(id, request);
 
         return bookIssued is null
             ? TypedResults.BadRequest("Unable to Update Book Issue Request")
@@ -71,10 +78,9 @@ public static class BookIssuedEndpoints
 
     private static IResult DeleteIssueBook(BookIssuedServices bookIssuedServices, int id)
     {
-        var isDeleted = bookIssuedServices.DeleteBookIssue(id);
+        bool isDeleted = bookIssuedServices.DeleteBookIssue(id);
         return isDeleted
             ? TypedResults.Ok("Book Issue Request Deleted Successfully")
             : TypedResults.BadRequest("Unable to Delete Book Issue Request");
     }
-
 }
