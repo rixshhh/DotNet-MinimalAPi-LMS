@@ -1,4 +1,4 @@
-﻿using System.Collections.ObjectModel;
+using System.Collections.ObjectModel;
 using LMSMinimalApi.Core.DTOs;
 using LMSMinimalApi.Core.Requests;
 using LMSMinimalApi.Persistence;
@@ -45,6 +45,31 @@ public sealed class BookIssuedServices
         if (!string.IsNullOrWhiteSpace(user))
         {
             query = query.Where(b => b.User.Name.Contains(user));
+        }
+
+        List<BookIssuedDTO> result = query
+            .Include(u => u.User)
+            .Include(b => b.Book)
+            .Select(bi => new BookIssuedDTO(
+                bi.ID,
+                bi.Book.BookName,
+                bi.User.Name,
+                bi.IssueDate,
+                bi.RenewDate,
+                bi.RenewCount,
+                bi.ReturnDate
+            )).ToList();
+
+        return new ReadOnlyCollection<BookIssuedDTO>(result);
+    }
+
+    public IEnumerable<BookIssuedDTO> GetBookIssuedByDate(DateOnly? issueDate)
+    {
+        IQueryable<BookIssued> query = _DbContext.BookIssued.AsQueryable();
+
+        if (issueDate.HasValue)
+        {
+            query = query.Where(b => b.IssueDate == issueDate.Value);
         }
 
         List<BookIssuedDTO> result = query

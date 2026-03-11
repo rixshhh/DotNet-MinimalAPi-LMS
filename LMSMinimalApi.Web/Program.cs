@@ -28,7 +28,7 @@ if (app.Environment.IsDevelopment())
     app.MapOpenApi();
 }
 
-app.UseHttpsRedirection();
+//app.UseHttpsRedirection();
 
 RouteGroupBuilder apiGroup = app.MapGroup("api");
 

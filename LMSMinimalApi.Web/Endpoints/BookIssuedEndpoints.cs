@@ -1,4 +1,4 @@
-﻿using LMSMinimalApi.Core.DTOs;
+using LMSMinimalApi.Core.DTOs;
 using LMSMinimalApi.Core.Requests;
 using LMSMinimalApi.Services;
 using Microsoft.AspNetCore.Http.HttpResults;
@@ -20,12 +20,12 @@ public static class BookIssuedEndpoints
         IEndpointRouteBuilder bookIssuedGroup = endpoints.MapBookIssuedGroup();
 
         bookIssuedGroup.MapGet("", GetBookIssued);
-        bookIssuedGroup.MapGet("Search", GetBookIssuedByUserName);
+        bookIssuedGroup.MapGet("SearchByUserName", SearchBookIssuedByUserName);
         bookIssuedGroup.MapGet("user/{UserID:int}/bookIssued", GetBookIssuedByUserID);
         bookIssuedGroup.MapPost("", CreateIssueBook);
         bookIssuedGroup.MapPut("Renew/{ID:int}", UpdateIssueBook);
         bookIssuedGroup.MapDelete("Delete/{ID:int}", DeleteIssueBook);
-
+        bookIssuedGroup.MapGet("SearchByDate", SearchBookIssuedByDate);
 
         return endpoints;
     }
@@ -37,11 +37,22 @@ public static class BookIssuedEndpoints
         return TypedResults.Ok(books);
     }
 
-    private static IResult GetBookIssuedByUserName(BookIssuedServices bookIssuedServices, string user)
+    private static IResult SearchBookIssuedByUserName(BookIssuedServices bookIssuedServices, string user)
     {
         IEnumerable<BookIssuedDTO>? bookIssued = bookIssuedServices.GetBookIssuedBySearch(user);
 
-        return bookIssued is null ? TypedResults.NotFound("UserName Not Found") : TypedResults.Ok(bookIssued);
+        return bookIssued is null
+            ? TypedResults.NotFound("UserName Not Found")
+            : TypedResults.Ok(bookIssued);
+    }
+
+    private static IResult SearchBookIssuedByDate(BookIssuedServices bookIssuedServices, DateOnly issueDate)
+    {
+        IEnumerable<BookIssuedDTO>? bookIssued = bookIssuedServices.GetBookIssuedByDate(issueDate);
+
+        return bookIssued is null
+            ? TypedResults.NotFound("No book issued records found.")
+            : TypedResults.Ok(bookIssued);
     }
 
     private static IResult GetBookIssuedByUserID(BookIssuedServices bookIssuedServices, int UserID)
