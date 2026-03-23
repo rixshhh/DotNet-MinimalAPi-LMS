@@ -1,4 +1,4 @@
-﻿namespace LMSMinimalApi.Core.DTOs;
+namespace LMSMinimalApi.Core.DTOs;
 
 public sealed class UsersDTO(
     int ID,
@@ -10,7 +10,6 @@ public sealed class UsersDTO(
 {
     public int ID { get; } = ID;
     public string Name { get; } = Name;
-
     public bool IsActive { get; } = IsActive;
     public string Type { get; } = Type;
     public int MaxBooks { get; } = MaxBooks;

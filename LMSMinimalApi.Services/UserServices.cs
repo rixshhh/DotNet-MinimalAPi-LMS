@@ -1,4 +1,4 @@
-﻿using LMSMinimalApi.Core.DTOs;
+using LMSMinimalApi.Core.DTOs;
 using LMSMinimalApi.Core.Requests;
 using LMSMinimalApi.Persistence;
 using Microsoft.EntityFrameworkCore;
@@ -19,6 +19,7 @@ public sealed class UserServices
 
     public IEnumerable<UsersDTO> GetUsersList()
     {
+
         IReadOnlyList<UsersDTO> users = _DbContext.Users
             .Include(u => u.UserType)
             .Select(u => new UsersDTO(

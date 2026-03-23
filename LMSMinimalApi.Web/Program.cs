@@ -20,6 +20,8 @@ builder.Services
     .AddScoped<CategoryServices>()
     .AddScoped<BookIssuedServices>();
 
+builder.Services.AddCors();
+
 WebApplication app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -29,6 +31,13 @@ if (app.Environment.IsDevelopment())
 }
 
 //app.UseHttpsRedirection();
+
+app.UseCors(option =>
+{
+    option.AllowAnyHeader();
+    option.AllowAnyMethod();
+    option.AllowAnyOrigin();
+});
 
 RouteGroupBuilder apiGroup = app.MapGroup("api");
 

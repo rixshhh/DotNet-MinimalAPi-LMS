@@ -1,4 +1,4 @@
-﻿using LMSMinimalApi.Core.DTOs;
+using LMSMinimalApi.Core.DTOs;
 using LMSMinimalApi.Core.Requests;
 using LMSMinimalApi.Persistence;
 using Microsoft.EntityFrameworkCore;
@@ -162,45 +162,45 @@ public sealed class BookServices
 
     public BooksDTO? DeleteBook(int ID)
     {
-        try
-        {
-            Books? book = _DbContext.Books.FirstOrDefault(b => b.ID == ID);
+        //try
+        //{
+        //    Books? book = _DbContext.Books.FirstOrDefault(b => b.ID == ID);
 
-            if (book is null)
-            {
-                throw new ConflictException($"Cannot find this Id {ID}");
-            }
+        //    if (book is null)
+        //    {
+        //        throw new ConflictException($"Cannot find this Id {ID}");
+        //    }
 
-            _DbContext.Books.Remove(book);
+        //    _DbContext.Books.Remove(book);
 
-            _DbContext.SaveChanges();
+        //    _DbContext.SaveChanges();
 
-            return new BooksDTO(
-                book.ID,
-                book.BookName,
-                book.Author,
-                book.Publisher,
-                book.Price,
-                _DbContext.Categories
-                    .Where(c => c.ID == book.CategoryID)
-                    .Select(c => c.CategoryName)
-                    .FirstOrDefault() ?? string.Empty
-            );
-        }
-        catch (ConflictException ex)
-        {
-            _logger.LogError(ex, "Error while creating a state with BookId {Id}. Some conflicts occured.",
-                ID);
-        }
-        catch (DbUpdateException ex)
-        {
-            _logger.LogError(ex,
-                "Error while Deleting a Book.");
-        }
-        catch (Exception e)
-        {
-            _logger.LogError(e, "Error while Deleting a Book with name {@BookName}.", ID);
-        }
+        //    return new BooksDTO(
+        //        book.ID,
+        //        book.BookName,
+        //        book.Author,
+        //        book.Publisher,
+        //        book.Price,
+        //        _DbContext.Categories
+        //            .Where(c => c.ID == book.CategoryID)
+        //            .Select(c => c.CategoryName)
+        //            .FirstOrDefault() ?? string.Empty
+        //    );
+        //}
+        //catch (ConflictException ex)
+        //{
+        //    _logger.LogError(ex, "Error while creating a state with BookId {Id}. Some conflicts occured.",
+        //        ID);
+        //}
+        //catch (DbUpdateException ex)
+        //{
+        //    _logger.LogError(ex,
+        //        "Error while Deleting a Book.");
+        //}
+        //catch (Exception e)
+        //{
+        //    _logger.LogError(e, "Error while Deleting a Book with name {@BookName}.", ID);
+        //}
 
         return null;
     }

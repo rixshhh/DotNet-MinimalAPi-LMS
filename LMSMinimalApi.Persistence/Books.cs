@@ -1,4 +1,4 @@
-﻿namespace LMSMinimalApi.Persistence;
+namespace LMSMinimalApi.Persistence;
 
 public sealed class Books
 {
