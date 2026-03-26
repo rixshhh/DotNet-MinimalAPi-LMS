@@ -20,6 +20,7 @@ public static class BookIssuedEndpoints
         IEndpointRouteBuilder bookIssuedGroup = endpoints.MapBookIssuedGroup();
 
         bookIssuedGroup.MapGet("", GetBookIssued);
+        bookIssuedGroup.MapGet("{id:int}", GetIssuedBookById);
         bookIssuedGroup.MapGet("SearchByUserName", SearchBookIssuedByUserName);
         bookIssuedGroup.MapGet("user/{UserID:int}/bookIssued", GetBookIssuedByUserID);
         bookIssuedGroup.MapPost("", CreateIssueBook);
@@ -35,6 +36,15 @@ public static class BookIssuedEndpoints
         IEnumerable<BookIssuedDTO> books = bookIssuedServices.GetBookIssued();
 
         return TypedResults.Ok(books);
+    }
+
+    private static IResult GetIssuedBookById(BookIssuedServices bookIssuedServices, int id)
+    {
+        var bookIssue = bookIssuedServices.GetBookIssuedById(id);
+
+        return bookIssue is null
+            ? TypedResults.NotFound("Id Not Found.")
+            : TypedResults.Ok(bookIssue);
     }
 
     private static IResult SearchBookIssuedByUserName(BookIssuedServices bookIssuedServices, string user)

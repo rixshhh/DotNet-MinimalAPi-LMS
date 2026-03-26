@@ -19,7 +19,6 @@ public sealed class UserServices
 
     public IEnumerable<UsersDTO> GetUsersList()
     {
-
         IReadOnlyList<UsersDTO> users = _DbContext.Users
             .Include(u => u.UserType)
             .Select(u => new UsersDTO(
@@ -32,6 +31,7 @@ public sealed class UserServices
 
         return users;
     }
+
 
     public UsersDTO? GetUserByID(int ID)
     {
@@ -119,11 +119,15 @@ public sealed class UserServices
         return null;
     }
 
-    public UsersDTO? UpdateUser(int Id, PostUserRequest request)
+    public UsersDTO? UpdateUser(int Id, UpdateUserRequest request)
     {
         try
         {
-            Users? user = _DbContext.Users.Find(Id);
+            Users? user = _DbContext.Users
+                .Include(u => u.UserType)
+                .FirstOrDefault(u => u.ID == Id);
+            //Users? user = _DbContext.Users
+            //    .Find(Id);
             if (user == null)
             {
                 _logger.LogWarning("User with ID {Id} not found for update.", Id);
@@ -131,7 +135,9 @@ public sealed class UserServices
             }
 
             user.Name = request.Name;
-            user.UserTypeID = request.UserTypeID;
+            user.UserType.TypeName = request.Type;
+            user.UserType.MaxBooks = request.MaxBooks;
+            //user.UserTypeID = request.UserTypeId;
             user.IsActive = request.IsActive;
 
             _DbContext.SaveChanges();
@@ -139,14 +145,16 @@ public sealed class UserServices
             UsersDTO result = new(
                 user.ID,
                 user.Name,
-                _DbContext.UserTypes
-                    .Where(u => u.ID == user.UserTypeID)
-                    .Select(u => u.TypeName)
-                    .FirstOrDefault() ?? string.Empty,
-                _DbContext.UserTypes
-                    .Where(u => u.ID == user.UserTypeID)
-                    .Select(u => u.MaxBooks)
-                    .FirstOrDefault(),
+                //_DbContext.UserTypes
+                //    .Where(u => u.ID == user.UserTypeID)
+                //    .Select(u => u.TypeName)
+                //    .FirstOrDefault() ?? string.Empty,
+                //_DbContext.UserTypes
+                //    .Where(u => u.ID == user.UserTypeID)
+                //    .Select(u => u.MaxBooks)
+                //    .FirstOrDefault(),
+                user.UserType.TypeName,
+                user.UserType.MaxBooks,
                 user.IsActive
             );
 

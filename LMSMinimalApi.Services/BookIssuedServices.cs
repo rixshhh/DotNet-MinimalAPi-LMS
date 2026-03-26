@@ -38,6 +38,29 @@ public sealed class BookIssuedServices
         return issuedBooks;
     }
 
+    public BookIssuedDTO? GetBookIssuedById(int id)
+    {
+        var issueBook = _DbContext.BookIssued
+            .Where(b => b.ID == id)
+            .Select(b => new BookIssuedDTO(
+                b.ID,
+                b.Book.BookName,
+                b.User.Name,
+                b.IssueDate,
+                b.RenewDate,
+                b.RenewCount,
+                b.ReturnDate
+            ))
+            .FirstOrDefault();
+
+        if (issueBook == null)
+        {
+            throw new ConflictException($"No IssuedBook found with this Id {id}");
+        }
+
+        return issueBook;
+    }
+
     public IEnumerable<BookIssuedDTO> GetBookIssuedBySearch(string? user)
     {
         IQueryable<BookIssued> query = _DbContext.BookIssued.AsQueryable();
@@ -119,24 +142,24 @@ public sealed class BookIssuedServices
         {
             Users? user = _DbContext.Users
                 .Include(u => u.UserType)
-                .FirstOrDefault(u => u.ID == request.UserID);
+                .FirstOrDefault(u => u.ID == request.UserId);
 
             if (user == null)
             {
-                throw new ConflictException($"User with ID {request.UserID} not found.");
+                throw new ConflictException($"User with ID {request.UserId} not found.");
             }
 
             Books? book = _DbContext.Books
-                .FirstOrDefault(b => b.ID == request.BookID);
+                .FirstOrDefault(b => b.ID == request.BookId);
 
             if (book == null)
             {
-                throw new ConflictException($"Book with ID {request.BookID} does not exist.");
+                throw new ConflictException($"Book with ID {request.BookId} does not exist.");
             }
 
             bool alreadyIssued = _DbContext.BookIssued
-                .Any(b => b.BookID == request.BookID &&
-                          b.UserID == request.UserID);
+                .Any(b => b.BookID == request.BookId &&
+                          b.UserID == request.UserId);
 
             if (alreadyIssued)
             {
@@ -144,7 +167,7 @@ public sealed class BookIssuedServices
             }
 
             int issuedBooksCount = _DbContext.BookIssued
-                .Count(b => b.UserID == request.UserID && b.ReturnDate != null);
+                .Count(b => b.UserID == request.UserId && b.ReturnDate != null);
 
             if (issuedBooksCount >= user.UserType.MaxBooks)
             {
@@ -154,8 +177,8 @@ public sealed class BookIssuedServices
 
             BookIssued bookIssue = new()
             {
-                BookID = request.BookID,
-                UserID = request.UserID,
+                BookID = request.BookId,
+                UserID = request.UserId,
                 IssueDate = DateOnly.FromDateTime(DateTime.Today),
                 RenewDate = null,
                 RenewCount = false,
@@ -181,7 +204,7 @@ public sealed class BookIssuedServices
         {
             _logger.LogError(ex,
                 "Error while creating Book Issue for UserID {UserID} and BookID {BookID}.",
-                request.UserID, request.BookID);
+                request.UserId, request.BookId);
         }
         catch (Exception e)
         {
@@ -203,8 +226,8 @@ public sealed class BookIssuedServices
                 return null;
             }
 
-            BookIssue.BookID = request.BookID;
-            BookIssue.UserID = request.UserID;
+            BookIssue.BookID = request.BookId;
+            BookIssue.UserID = request.UserId;
             BookIssue.IssueDate = request.IssueDate;
             BookIssue.RenewDate = request.RenewDate;
             BookIssue.RenewCount = request.RenewCount;

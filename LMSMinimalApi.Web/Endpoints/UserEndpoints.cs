@@ -1,4 +1,4 @@
-﻿using LMSMinimalApi.Core.DTOs;
+using LMSMinimalApi.Core.DTOs;
 using LMSMinimalApi.Core.Requests;
 using LMSMinimalApi.Services;
 using Microsoft.AspNetCore.Http.HttpResults;
@@ -56,7 +56,7 @@ public static class UserEndpoints
             : TypedResults.Ok(result);
     }
 
-    private static IResult Update(UserServices userServices, int ID, PostUserRequest request)
+    private static IResult Update(UserServices userServices, int ID, UpdateUserRequest request)
     {
         UsersDTO? result = userServices.UpdateUser(ID, request);
         return result is null
