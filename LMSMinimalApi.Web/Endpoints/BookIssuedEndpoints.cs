@@ -26,7 +26,7 @@ public static class BookIssuedEndpoints
         bookIssuedGroup.MapPost("", CreateIssueBook);
         bookIssuedGroup.MapPut("Renew/{ID:int}", UpdateIssueBook);
         bookIssuedGroup.MapDelete("Delete/{ID:int}", DeleteIssueBook);
-        bookIssuedGroup.MapGet("SearchByDate", SearchBookIssuedByDate);
+        bookIssuedGroup.MapGet("search", SearchBookIssuedByDate);
 
         return endpoints;
     }
@@ -56,13 +56,14 @@ public static class BookIssuedEndpoints
             : TypedResults.Ok(bookIssued);
     }
 
-    private static IResult SearchBookIssuedByDate(BookIssuedServices bookIssuedServices, DateOnly issueDate)
+    public static IResult SearchBookIssuedByDate(DateTime? fromDate, DateTime? toDate, BookIssuedServices bookIssuedservice)
     {
-        IEnumerable<BookIssuedDTO>? bookIssued = bookIssuedServices.GetBookIssuedByDate(issueDate);
+        var data = bookIssuedservice.GetBookIssuedByDate(
+            fromDate.HasValue ? DateOnly.FromDateTime(fromDate.Value) : null,
+            toDate.HasValue ? DateOnly.FromDateTime(toDate.Value) : null
+        );
 
-        return bookIssued is null
-            ? TypedResults.NotFound("No book issued records found.")
-            : TypedResults.Ok(bookIssued);
+        return Results.Ok(data);
     }
 
     private static IResult GetBookIssuedByUserID(BookIssuedServices bookIssuedServices, int UserID)

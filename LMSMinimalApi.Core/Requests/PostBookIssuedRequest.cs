@@ -7,10 +7,10 @@ public sealed class PostBookIssuedRequest
     public int ID { get; init; }
 
     [JsonPropertyName("bookId")]
-    public required int BookId { get; init; }
+    public int BookId { get; init; }
 
     [JsonPropertyName("userId")]
-    public required int UserId { get; init; }
+    public int UserId { get; init; }
     public DateOnly IssueDate { get; init; }
     public DateOnly? RenewDate { get; init; }
 

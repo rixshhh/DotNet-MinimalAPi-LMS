@@ -26,7 +26,9 @@ public sealed class BookIssuedServices
             .Select(bi => new BookIssuedDTO
             (
                 bi.ID,
+                bi.Book.ID,
                 bi.Book.BookName,
+                bi.User.ID,
                 bi.User.Name,
                 bi.IssueDate,
                 bi.RenewDate,
@@ -44,7 +46,9 @@ public sealed class BookIssuedServices
             .Where(b => b.ID == id)
             .Select(b => new BookIssuedDTO(
                 b.ID,
+                b.Book.ID,
                 b.Book.BookName,
+                b.User.ID,
                 b.User.Name,
                 b.IssueDate,
                 b.RenewDate,
@@ -75,7 +79,9 @@ public sealed class BookIssuedServices
             .Include(b => b.Book)
             .Select(bi => new BookIssuedDTO(
                 bi.ID,
+                bi.Book.ID,
                 bi.Book.BookName,
+                bi.User.ID,
                 bi.User.Name,
                 bi.IssueDate,
                 bi.RenewDate,
@@ -86,29 +92,35 @@ public sealed class BookIssuedServices
         return new ReadOnlyCollection<BookIssuedDTO>(result);
     }
 
-    public IEnumerable<BookIssuedDTO> GetBookIssuedByDate(DateOnly? issueDate)
+    public IEnumerable<BookIssuedDTO> GetBookIssuedByDate(DateOnly? fromDate, DateOnly? toDate)
     {
         IQueryable<BookIssued> query = _DbContext.BookIssued.AsQueryable();
 
-        if (issueDate.HasValue)
+        if (fromDate.HasValue)
         {
-            query = query.Where(b => b.IssueDate == issueDate.Value);
+            query = query.Where(b => b.IssueDate >= fromDate.Value);
         }
 
-        List<BookIssuedDTO> result = query
+        if (toDate.HasValue)
+        {
+            query = query.Where(b => b.IssueDate <= toDate.Value);
+        }
+
+        return query
             .Include(u => u.User)
             .Include(b => b.Book)
             .Select(bi => new BookIssuedDTO(
                 bi.ID,
+                bi.Book.ID,
                 bi.Book.BookName,
+                bi.User.ID,
                 bi.User.Name,
                 bi.IssueDate,
                 bi.RenewDate,
                 bi.RenewCount,
                 bi.ReturnDate
-            )).ToList();
-
-        return new ReadOnlyCollection<BookIssuedDTO>(result);
+            ))
+            .ToList();
     }
 
     public IEnumerable<BookIssuedDTO> GetBookIssuedByUserId(int userId)
@@ -119,7 +131,9 @@ public sealed class BookIssuedServices
             .Where(b => b.UserID == userId)
             .Select(b => new BookIssuedDTO(
                 b.ID,
+                b.Book.ID,
                 b.Book.BookName,
+                b.User.ID,
                 b.User.Name,
                 b.IssueDate,
                 b.RenewDate,
@@ -190,7 +204,9 @@ public sealed class BookIssuedServices
 
             BookIssuedDTO CreatedIssuedBook = new(
                 bookIssue.ID,
+                book.ID,
                 book.BookName,
+                user.ID,
                 user.Name,
                 bookIssue.IssueDate,
                 bookIssue.RenewDate,
@@ -237,10 +253,12 @@ public sealed class BookIssuedServices
 
             BookIssuedDTO updatedBookIssueDTO = new(
                 BookIssue.ID,
+                BookIssue.BookID,
                 _DbContext.Books
                     .Where(b => b.ID == BookIssue.BookID)
                     .Select(b => b.BookName)
                     .FirstOrDefault() ?? string.Empty,
+                BookIssue.UserID,
                 _DbContext.Users
                     .Where(u => u.ID == BookIssue.UserID)
                     .Select(u => u.Name)
